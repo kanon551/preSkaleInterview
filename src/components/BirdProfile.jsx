@@ -4,12 +4,24 @@ import {Container,BirdImage,OnlyBackground,BirdDescription,
     LocationLabel,DateLabel} from '../components/BirdProfileStyles';
 
 const BirdProfile = ({obj}) => {
+
+    const convertBackendDateToFront = (value) => {
+        var date = new Date(value.replace('IST', ''));
+        let day = date.getDate();
+        let month = date.getMonth()+1;
+        let year = date.getFullYear();
+        const changeddate = month+"/"+day+"/"+year
+        return changeddate;
+      }
+
+      
+
   return (
     <Container>
-        <BirdImage img={obj.image}>
+        <BirdImage img={`data:image/jpeg;base64,${obj.image.data}`}>
             <OnlyBackground stat={obj.status}>
                     {
-                        obj.commonName
+                        obj.status
                     }
             </OnlyBackground>
         </BirdImage>
@@ -30,12 +42,12 @@ const BirdProfile = ({obj}) => {
                     </Last>
                     <LocationLabel>
                         {
-                            obj.spotLocation
+                            obj.spottedLocation
                         }
                     </LocationLabel>
                     <DateLabel>
                         {
-                            obj.spotDate
+                            convertBackendDateToFront(obj.spottedDate)
                         }
                     </DateLabel>
                 </Bottom>

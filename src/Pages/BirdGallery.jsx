@@ -1,12 +1,43 @@
-import React from 'react'
+import React, { useState,useRef,useEffect } from 'react'
 import Header from '../components/Header'
 import {Library} from '../components/BirdLibrary';
 import BirdProfile from '../components/BirdProfile';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import {Container,Body,BirdsInfo} from '../Pages/BirdGalleryStyles'
+import axios from 'axios';
 
 const BirdGallery = () => {
+
+  const [birds, setBirds] = useState([]);
+
+  useEffect(()=>{
+    getBirds();
+  },[])
+
+  const getRowsWithID = (rows) => {
+    let id = 0;
+    let CompleteRowListArray = []
+
+    for(let row of rows){
+      const rowWithID = {
+        id: id,
+        ...row
+      }
+      id++
+      CompleteRowListArray.push(rowWithID)
+    }
+
+    return CompleteRowListArray
+  }
+
+ 
+
+
+  const getBirds = async() => {
+    const res = await axios.get(`http://localhost:5000/api/preSkale/getBirds`)  ;
+    setBirds(getRowsWithID(res.data['object'])) 
+  }
 
   return (
     <Container>
@@ -23,8 +54,8 @@ const BirdGallery = () => {
             <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }} 
             style={{ marginTop: '20px'}}>
                     {
-                        Library.map((obj)=> (
-                            <Grid item xs={12} sm={12} md={4} lg={4} xl={4} key={obj.id}>
+                        birds.map((obj)=> (
+                            <Grid item xs={12} sm={12} md={4} lg={4} xl={4} key={obj._id}>
                                 <BirdProfile obj={obj} />
                             </Grid>
                         ))

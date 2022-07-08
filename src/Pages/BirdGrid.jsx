@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState,useRef,useEffect } from 'react'
 import Header from '../components/Header'
 import Box from '@mui/material/Box';
 import { DataGrid, GridToolbar} from '@mui/x-data-grid';
@@ -17,21 +17,36 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import {Library} from '../components/BirdLibrary';
 import {Container, BirdsInfo, BirdInfoTitle, BirdInfoDescription, CrudButton, 
   DialogButton,Input, DialogInput, Body, Table, DialogLabel} from '../Pages/BirdGridStyle';
   import {useNavigate} from 'react-router-dom';
+  import { useCallback } from 'react';
+  import axios from 'axios';
+  import Snackbar from '@mui/material/Snackbar';
+  import Button from '@mui/material/Button';
+
 
   const BirdGrid = () => {
 
     const navigate = useNavigate();
-    const [rows, setRows] = useState(Library);
+    const fileInput = useRef(null)
+
+
+    const [birds, setBirds] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
-    // const [open, setOpen] = useState(false);
+    const vertical = "top";
+    const horizontal = "right";
+    const[message,setMessage] = useState('');
+    const [open, setOpen] = useState(false);
     const [birdID, setBirdID] = useState('');
 
+    const [deleteConfirm, setDeleteConfirm] = useState(false);
+    const [copyBirds, setCopyBirds] = useState([])
+    
+
     /***********Date *************************/
-    const [value, setValue] = useState((new Date().getMonth()+1)+"/"+new Date().getDate()+"/"+new Date().getFullYear());
+    
+    const [value, setValue] = useState(new Date());
     const handleChange = (newValue) => {
       setValue(newValue);
     };
@@ -42,27 +57,65 @@ import {Container, BirdsInfo, BirdInfoTitle, BirdInfoDescription, CrudButton,
     const [commonName, setCommonName] = useState('');
     const [scientificName, setscientificName] = useState('');
     const [spotLocation, setspotLocation] = useState('');
+    const [file, setFile] = useState(null);
     
     const { loading } = useDemoData({ });
 
+    useEffect(()=>{
+      getBirds();
+    },[])
+
+    const getRowsWithID = (rows) => {
+      let id = 0;
+      let CompleteRowListArray = []
+  
+      for(let row of rows){
+        const rowWithID = {
+          id: id,
+          ...row
+        }
+        id++
+        CompleteRowListArray.push(rowWithID)
+      }
+  
+      return CompleteRowListArray
+    }
+
+    const convertBackendDateToFront = (value) => {
+      var date = new Date(value.replace('IST', ''));
+      let day = date.getDate();
+      let month = date.getMonth()+1;
+      let year = date.getFullYear();
+      const changeddate = month+"/"+day+"/"+year
+      return changeddate;
+    }
+
+
+    const getBirds = async() => {
+      const res = await axios.get(`http://localhost:5000/api/preSkale/getBirds`)  ;
+      setCopyBirds(getRowsWithID(res.data['object']))
+      setBirds(getRowsWithID(res.data['object'])) 
+    }
+
     const checkBirdLibrary = (e)=>{
+      console.log(e.keyCode)
+      console.log(e.target.value)
       if(e.keyCode === 8){
           //console.log("backward filtering")
           const noBackCharecter = e.target.value.slice(0, -1)
           const p = Array.from(noBackCharecter).reduce((a, v, i) => `${a}[^${noBackCharecter.substr(i)}]*?${v}`, '');
           const re = RegExp(p);
-          setRows(Library.filter(v => v.commonName.toLowerCase().match(re)))
+          setBirds(copyBirds.filter(v => v.commonName.toLowerCase().match(re)))
       }
       else if(e.target.value !== ""){
           //console.log("forward filtering")
-          //setPageNumber(0)
           const p = Array.from(e.target.value).reduce((a, v, i) => `${a}[^${e.target.value.substr(i)}]*?${v}`, '');
           const re = RegExp(p);
-          setRows((prev)=>
+          setBirds((prev)=>
       [...prev].filter(v => v.commonName.toLowerCase().match(re)))
       }
       else{
-        setRows(Library)
+        setBirds(copyBirds)
       }
       
     }
@@ -70,8 +123,12 @@ import {Container, BirdsInfo, BirdInfoTitle, BirdInfoDescription, CrudButton,
 
   const columns= [
   { field: 'commonName', headerName: 'Name', width: 230 },
-  { field: 'spotLocation', headerName: 'Spotted Location', width: 230 },
-  { field: 'spotDate', headerName: 'Last Spotted Date', width: 230 },
+  { field: 'spottedLocation', headerName: 'Spotted Location', width: 230 },
+  { field: 'spottedDate', headerName: 'Last Spotted Date', width: 230,
+    valueGetter: (params) => {
+      return convertBackendDateToFront(params.value)
+    }
+  },
   { field: 'status', headerName: 'Conservation Status', width: 230,
   renderCell: (cellValues) => {
     if(cellValues.value === "Critically Endangered"){
@@ -113,24 +170,25 @@ import {Container, BirdsInfo, BirdInfoTitle, BirdInfoDescription, CrudButton,
           );
     }
       
-    } },
-  { field: 'scientific', headerName: 'Scientific Name', width: 230},
+    } 
+  },
+  { field: 'scientificName', headerName: 'Scientific Name', width: 230},
   { field: 'actions', 
       type: 'actions', 
       width: 250,
       getActions: (event) => [
         <CrudButton onClick={()=>handleClickOpen(event)} color={"#9d9d9d"}  label="Edit">Edit</CrudButton>,
-        <CrudButton onClick={()=> deleteUser(event)} color={"red"} label="Delete">Delete</CrudButton>
+         <CrudButton onClick={()=> deleteUser(event)} color={"red"} label="Delete">Delete</CrudButton>
       ], 
     },
 ];
-// const handleClose = (event, reason) => {
-//     if (reason === 'clickaway') {
-//       return;
-//     }
+const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
 
-//     setOpen(false);
-//   };
+    setOpen(false);
+  };
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
@@ -142,36 +200,144 @@ const handleClickOpen = (event) => {
         setCommonName('')
         setscientificName('')
         setspotLocation('')
-        setValue((new Date().getMonth()+1)+"/"+new Date().getDate()+"/"+new Date().getFullYear())
         setStatus(0)
         setFamily(0)
+        setValue(new Date())
         setOpenDialog(true);
     }
     else{
-        setBirdID(event.row.id)
+        setBirdID(event.row._id)
         setCommonName(event.row.commonName)
-        setscientificName(event.row.scientific)
-        setspotLocation(event.row.spotLocation)
-        setValue(event.row.spotDate)
+        setscientificName(event.row.scientificName)
+        setspotLocation(event.row.spottedLocation)
+        let convertToStringDate = convertBackendDateToFront(event.row.spottedDate)
+        let stringDateToObject = new Date(convertToStringDate)
+        setValue(stringDateToObject)
         setStatus(event.row.status)
         setFamily(event.row.family)
         setOpenDialog(true);
     }
-
-    setOpenDialog(true);
   };
 
   const deleteUser = (event) => {
-        //   authAxios.delete(`/sampleUsers/${event.id}`)
-        //   .then( res => { 
-        //     setMessage(res.data.response)
-        //     setOpen(true); 
-        //     getUsers(); 
-        //   }) 
-        // .catch(e => {
-
-        // })
+    setBirdID(event.row._id)
+    setDeleteConfirm(true)
+        
   }
+
+  const deleteConfirmed = async()=> {
+      await axios.delete(`http://localhost:5000/api/preSkale/deleteBird/${birdID}`)
+      .then( res => { 
+        setMessage(res.data['message']);
+        setOpen(true); 
+        setDeleteConfirm(false)
+        getBirds();
+      }) 
+    .catch(e => {
+
+    })
+  }
+
+  const imageUpload = useCallback((e)=> {
+    const file = Math.round((e.target.files[0].size / 1024));
+                // The size of the file.
+                if (file >= 250) {
+                  setMessage("File too Big, please select a file under 220kb")
+                  setOpen(true); 
+                  setFile(null);
+                  fileInput.current.value = null;
+                }  else {
+                  setFile(e.target.files[0])
+                }
+      
+   })
+
+   const save = async()=> {
+
+    if(commonName === ""){
+      setMessage("Enter Bird Name")
+      setOpen(true); 
+    }
+    else if(status === 0){
+            setMessage("Please select Status")
+            setOpen(true); 
+    }
+    else{
+            let formData = new FormData();
+            formData.append('commonName', commonName); 
+            formData.append('scientificName', scientificName); 
+            formData.append('spottedDate', value); 
+            formData.append('spottedLocation', spotLocation); 
+            formData.append('status', status.toString()); 
+            formData.append('family', family.toString()); 
+            formData.append('file', file);
+
+            /**************JSON****** */
+            // const data = {
+            //   commonName: commonName,
+            //   scientificName: scientificName,
+            //   spottedDate: value,
+            //   spottedLocation: spotLocation,
+            //   status: status.toString(),
+            //   family: family.toString(),
+            //   image: file
+            // }
+            /**************JSON****** */
+
+           
+            try{
+
+              if(birdID === ""){
+                await axios.post(`http://localhost:5000/api/preSkale/saveBird`,formData)
+                .then(response => {
+                  setMessage(response.data['message']);
+                  setOpen(true); 
+                  setStatus(0);
+                  setFamily(0);
+                  setCommonName('');
+                  setscientificName('');
+                  setspotLocation('');
+                  setFile(null);
+                  setValue(new Date());
+                  fileInput.current.value = null;
+                  setOpenDialog(false);
+                  getBirds();
+                })
+                .catch(e=> {
+
+                })
+              }
+              else if(birdID !== ""){
+                formData.append('id', birdID); 
+                await axios.put(`http://localhost:5000/api/preSkale/updateBird`,formData)
+                .then(response => {
+                  setMessage(response.data['message']);
+                  setOpen(true); 
+                  setStatus(0);
+                  setFamily(0);
+                  setCommonName('');
+                  setscientificName('');
+                  setspotLocation('');
+                  setFile(null);
+                  setValue(new Date());
+                  fileInput.current.value = null;
+                  setOpenDialog(false);
+                  getBirds();
+                })
+                .catch(e=> {
+
+                })
+              }
+                   
+
+                    
+          }
+        
+          catch(e){
+              console.log(e)
+          }
+    }
+   }
 
   return (
     <Container>
@@ -194,7 +360,6 @@ const handleClickOpen = (event) => {
             <Box
                 sx={{ display: 'flex',flexDirection:'row', p: 1,  borderRadius: 1,
                 alignItems:'center', justifyContent:'space-between', marginTop:'20px', marginBottom:'20px',
-                //background: 'rgba(0, 0, 0, 0.04)'
             }}
             >
                     <Input placeholder="Search by name..."  
@@ -206,9 +371,9 @@ const handleClickOpen = (event) => {
 
             <Table>
                 <DataGrid style={{color:'black', backgroundColor:'white', width:'auto'}}
-                rows={rows}
+                rows={birds}
                 columns={columns}
-                /* getRowId={(row) => row._id} */
+                getRowId={(row) => row._id}
                 loading={loading} 
                 components={{ Toolbar: GridToolbar }} />
              </Table>
@@ -241,7 +406,6 @@ const handleClickOpen = (event) => {
                                 <DialogLabel>Spotted Date(MM/dd/yyyy)</DialogLabel>
                                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                                   <DesktopDatePicker
-                                    // label="Date desktop"
                                     inputFormat="MM/dd/yyyy"
                                     value={value}
                                     onChange={handleChange}
@@ -288,12 +452,20 @@ const handleClickOpen = (event) => {
                                     </Select>
                                 </FormControl>
                             </Grid>
+                            <Grid item  xs={12} sm={12} md={6} lg={6} xl={6}>
+                                <DialogLabel>Bird Image</DialogLabel>
+                                <input type={"file"} 
+                                style={{border: "none"}} 
+                                accept={"image/*"} 
+                                multiple={false} 
+                                ref={fileInput}
+                                onChange={(e) => imageUpload(e)} />
+                            </Grid>
                         </Grid>
                         </DialogContentText>
                     </DialogContent>
-                    <DialogActions style={{padding: '16px 24px',backgroundColor: '#eaeaec'}}>
-                       
-                        <DialogButton autoFocus >
+                    <DialogActions style={{padding: '16px 24px',backgroundColor: '#eaeaec' }}>
+                        <DialogButton autoFocus onClick={save}>
                           {
                             birdID === '' ? "Save" : "Update"
                           }
@@ -302,7 +474,39 @@ const handleClickOpen = (event) => {
 
                 </Dialog>
       </Body>
-      
+
+      <Dialog
+        open={deleteConfirm}
+        onClose={()=> setDeleteConfirm(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+                Delete Record
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+                  Are You sure about deleting this record ?
+                  Because once deleted cant be retrived.
+                  Confirm Delete
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={deleteConfirmed} autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+
+      <Snackbar
+       anchorOrigin={{ vertical, horizontal }}
+        open={open}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        message={message}
+        key={vertical + horizontal}
+      />
     </Container>
   )
 }
