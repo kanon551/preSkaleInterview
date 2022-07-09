@@ -3,7 +3,6 @@ import Header from '../components/Header'
 import Box from '@mui/material/Box';
 import { DataGrid, GridToolbar} from '@mui/x-data-grid';
 import { useDemoData } from '@mui/x-data-grid-generator';
-import '../Pages/BirdGrid.css';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -407,12 +406,16 @@ const handleClickOpen = (event) => {
                             </Grid>
                             <Grid item  xs={12} sm={12} md={6} lg={6} xl={6}>
                                 <DialogLabel>Spotted Date(MM/dd/yyyy)</DialogLabel>
-                                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                <LocalizationProvider dateAdapter={AdapterDateFns} >
                                   <DesktopDatePicker
                                     inputFormat="MM/dd/yyyy"
                                     value={value}
+                                    style={{height:'40px'}}
                                     onChange={handleChange}
-                                    renderInput={(params) => <TextField {...params}/>}
+                                    // className={DateStyle}
+                                    renderInput={
+                                      (params) => <TextField style={{background: 'white'}}  {...params}/>
+                                    }
                                   />
                                 </LocalizationProvider>
                             </Grid>
@@ -429,7 +432,7 @@ const handleClickOpen = (event) => {
                                       value={status}
                                       label="Age"
                                       onChange={(e)=> setStatus(e.target.value)}
-                                      style={{background:'white', height:'40px'}}
+                                      style={{background:'white', height:'50px'}}
                                     >
                                       <MenuItem value={0}>None</MenuItem>
                                       <MenuItem value={'Least Concern'}>Least Concern</MenuItem>
@@ -445,7 +448,7 @@ const handleClickOpen = (event) => {
                                       id="demo-simple-select"
                                       value={family}
                                       label="Age"
-                                      style={{background:'white', height:'40px'}}
+                                      style={{background:'white', height:'50px'}}
                                       onChange={(e)=> setFamily(e.target.value)}
                                     >
                                       <MenuItem value={0}>None</MenuItem>

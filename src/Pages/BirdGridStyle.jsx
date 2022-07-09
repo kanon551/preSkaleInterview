@@ -85,8 +85,9 @@ export const DialogInput = styled.input`
   width: 100%;
   border: 1px solid #555;
   display: block;
-  height: 40px;
+  height: 50px;
   border: none;
+  font-size: medium;
   min-width: 150px;
   border-radius: 5px;
   background-color: white;
@@ -109,4 +110,10 @@ export const Table = styled.div`
 
 export const DialogLabel = styled.label`
   font-size: large;
+`
+
+export const DateStyle = styled.div`
+     background: white;
+    height: 40px;
+    width: 100%;
 `
