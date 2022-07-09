@@ -412,7 +412,7 @@ const handleClickOpen = (event) => {
                                     inputFormat="MM/dd/yyyy"
                                     value={value}
                                     onChange={handleChange}
-                                    renderInput={(params) => <TextField {...params} />}
+                                    renderInput={(params) => <TextField {...params}/>}
                                   />
                                 </LocalizationProvider>
                             </Grid>
@@ -429,6 +429,7 @@ const handleClickOpen = (event) => {
                                       value={status}
                                       label="Age"
                                       onChange={(e)=> setStatus(e.target.value)}
+                                      style={{background:'white', height:'40px'}}
                                     >
                                       <MenuItem value={0}>None</MenuItem>
                                       <MenuItem value={'Least Concern'}>Least Concern</MenuItem>
@@ -444,6 +445,7 @@ const handleClickOpen = (event) => {
                                       id="demo-simple-select"
                                       value={family}
                                       label="Age"
+                                      style={{background:'white', height:'40px'}}
                                       onChange={(e)=> setFamily(e.target.value)}
                                     >
                                       <MenuItem value={0}>None</MenuItem>
