@@ -35,7 +35,7 @@ const BirdGallery = () => {
 
 
   const getBirds = async() => {
-    const res = await axios.get(`http://localhost:5000/api/preSkale/getBirds`)  ;
+    const res = await axios.get(`https://birdslibrary.herokuapp.com/api/preSkale/getBirds`)  ;
     setBirds(getRowsWithID(res.data['object'])) 
   }
 

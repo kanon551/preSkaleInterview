@@ -92,7 +92,7 @@ import {Container, BirdsInfo, BirdInfoTitle, BirdInfoDescription, CrudButton,
 
 
     const getBirds = async() => {
-      const res = await axios.get(`http://localhost:5000/api/preSkale/getBirds`)  ;
+      const res = await axios.get(`https://birdslibrary.herokuapp.com/api/preSkale/getBirds`)  ;
       setCopyBirds(getRowsWithID(res.data['object']))
       setBirds(getRowsWithID(res.data['object'])) 
     }
@@ -226,7 +226,7 @@ const handleClickOpen = (event) => {
   }
 
   const deleteConfirmed = async()=> {
-      await axios.delete(`http://localhost:5000/api/preSkale/deleteBird/${birdID}`)
+      await axios.delete(`https://birdslibrary.herokuapp.com/api/preSkale/deleteBird/${birdID}`)
       .then( res => { 
         setMessage(res.data['message']);
         setOpen(true); 
@@ -288,7 +288,7 @@ const handleClickOpen = (event) => {
             try{
 
               if(birdID === ""){
-                await axios.post(`http://localhost:5000/api/preSkale/saveBird`,formData)
+                await axios.post(`https://birdslibrary.herokuapp.com/api/preSkale/saveBird`,formData)
                 .then(response => {
                   setMessage(response.data['message']);
                   setOpen(true); 
@@ -309,7 +309,7 @@ const handleClickOpen = (event) => {
               }
               else if(birdID !== ""){
                 formData.append('id', birdID); 
-                await axios.put(`http://localhost:5000/api/preSkale/updateBird`,formData)
+                await axios.put(`https://birdslibrary.herokuapp.com/api/preSkale/updateBird`,formData)
                 .then(response => {
                   setMessage(response.data['message']);
                   setOpen(true); 
