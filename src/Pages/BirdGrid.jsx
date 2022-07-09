@@ -92,9 +92,12 @@ import {Container, BirdsInfo, BirdInfoTitle, BirdInfoDescription, CrudButton,
 
 
     const getBirds = async() => {
-      const res = await axios.get(`https://birdslibrary.herokuapp.com/api/preSkale/getBirds`)  ;
-      setCopyBirds(getRowsWithID(res.data['object']))
-      setBirds(getRowsWithID(res.data['object'])) 
+       await axios.get(`https://birdslibrary.herokuapp.com/api/preSkale/getBirds`)
+                        .then(res => {
+                          setCopyBirds(getRowsWithID(res.data['object']))
+                          setBirds(getRowsWithID(res.data['object'])) 
+                        });
+     
     }
 
     const checkBirdLibrary = (e)=>{
