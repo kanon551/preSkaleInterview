@@ -107,13 +107,15 @@ import CircularProgress from '@mui/material/CircularProgress';
       if(e.keyCode === 8){
           //console.log("backward filtering")
           const noBackCharecter = e.target.value.slice(0, -1)
-          const p = Array.from(noBackCharecter).reduce((a, v, i) => `${a}[^${noBackCharecter.substr(i)}]*?${v}`, '');
+          let caseInsensitive = noBackCharecter.toLowerCase();
+          const p = Array.from(caseInsensitive).reduce((a, v, i) => `${a}[^${caseInsensitive.substr(i)}]*?${v}`, '');
           const re = RegExp(p);
           setBirds(copyBirds.filter(v => v.commonName.toLowerCase().match(re)))
       }
       else if(e.target.value !== ""){
           //console.log("forward filtering")
-          const p = Array.from(e.target.value).reduce((a, v, i) => `${a}[^${e.target.value.substr(i)}]*?${v}`, '');
+          let caseInsensitive = e.target.value.toLowerCase();
+          const p = Array.from(caseInsensitive).reduce((a, v, i) => `${a}[^${caseInsensitive.substr(i)}]*?${v}`, '');
           const re = RegExp(p);
           setBirds((prev)=>
       [...prev].filter(v => v.commonName.toLowerCase().match(re)))
