@@ -1,7 +1,7 @@
 import React, { useState,useRef,useEffect } from 'react'
 import Header from '../components/Header'
 import Box from '@mui/material/Box';
-import { DataGrid, GridToolbar} from '@mui/x-data-grid';
+import { DataGrid, GridToolbar,GridActionsCellItem} from '@mui/x-data-grid';
 import { useDemoData } from '@mui/x-data-grid-generator';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -23,7 +23,10 @@ import {Container, BirdsInfo, BirdInfoTitle, BirdInfoDescription, CrudButton,
   import axios from 'axios';
   import Snackbar from '@mui/material/Snackbar';
   import Button from '@mui/material/Button';
-
+import AddCardIcon from '@mui/icons-material/AddCard';
+import CollectionsIcon from '@mui/icons-material/Collections';
+import Fade from '@mui/material/Fade';
+import CircularProgress from '@mui/material/CircularProgress';
 
   const BirdGrid = () => {
 
@@ -41,7 +44,7 @@ import {Container, BirdsInfo, BirdInfoTitle, BirdInfoDescription, CrudButton,
 
     const [deleteConfirm, setDeleteConfirm] = useState(false);
     const [copyBirds, setCopyBirds] = useState([])
-    
+    const [progress, setProgress] = useState(true);
 
     /***********Date *************************/
     
@@ -93,6 +96,7 @@ import {Container, BirdsInfo, BirdInfoTitle, BirdInfoDescription, CrudButton,
     const getBirds = async() => {
        await axios.get(`https://birdslibrary.herokuapp.com/api/preSkale/getBirds`)
                         .then(res => {
+                          setProgress(false);
                           setCopyBirds(getRowsWithID(res.data['object']))
                           setBirds(getRowsWithID(res.data['object'])) 
                         });
@@ -100,8 +104,6 @@ import {Container, BirdsInfo, BirdInfoTitle, BirdInfoDescription, CrudButton,
     }
 
     const checkBirdLibrary = (e)=>{
-      console.log(e.keyCode)
-      console.log(e.target.value)
       if(e.keyCode === 8){
           //console.log("backward filtering")
           const noBackCharecter = e.target.value.slice(0, -1)
@@ -124,14 +126,15 @@ import {Container, BirdsInfo, BirdInfoTitle, BirdInfoDescription, CrudButton,
 
 
   const columns= [
-  { field: 'commonName', headerName: 'Name', width: 230 },
-  { field: 'spottedLocation', headerName: 'Spotted Location', width: 230 },
-  { field: 'spottedDate', headerName: 'Last Spotted Date', width: 230,
+  { field: 'id', headerName: 'ID', width: 100 },
+  { field: 'commonName', headerName: 'Name', width: 200 },
+  { field: 'spottedLocation', headerName: 'Spotted Location', width: 200 },
+  { field: 'spottedDate', headerName: 'Last Spotted Date', width: 200,
     valueGetter: (params) => {
       return convertBackendDateToFront(params.value)
     }
   },
-  { field: 'status', headerName: 'Conservation Status', width: 230,
+  { field: 'status', headerName: 'Conservation Status', width: 200,
   renderCell: (cellValues) => {
     if(cellValues.value === "Critically Endangered"){
         return (
@@ -174,7 +177,7 @@ import {Container, BirdsInfo, BirdInfoTitle, BirdInfoDescription, CrudButton,
       
     } 
   },
-  { field: 'scientificName', headerName: 'Scientific Name', width: 230},
+  { field: 'scientificName', headerName: 'Scientific Name', width: 200},
   { field: 'actions', 
       type: 'actions', 
       width: 250,
@@ -232,6 +235,7 @@ const handleClickOpen = (event) => {
       .then( res => { 
         setMessage(res.data['message']);
         setOpen(true); 
+        setProgress(true);
         setDeleteConfirm(false)
         getBirds();
       }) 
@@ -294,6 +298,7 @@ const handleClickOpen = (event) => {
                 .then(response => {
                   setMessage(response.data['message']);
                   setOpen(true); 
+                  setProgress(true);
                   setStatus(0);
                   setFamily(0);
                   setCommonName('');
@@ -315,6 +320,7 @@ const handleClickOpen = (event) => {
                 .then(response => {
                   setMessage(response.data['message']);
                   setOpen(true); 
+                  setProgress(true);
                   setStatus(0);
                   setFamily(0);
                   setCommonName('');
@@ -357,7 +363,7 @@ const handleClickOpen = (event) => {
                         Manage all species of birds and their information
                     </BirdInfoDescription>
                 </BirdsInfo>
-                <CrudButton onClick={handleClickOpen} color={"#2e7d32"}>+ Add</CrudButton>
+                <GridActionsCellItem  onClick={handleClickOpen} icon={<AddCardIcon sx={{color:"#2e7d32", fontSize:40}}/>}  label="Add"/>
             </Box>
             <Box
                 sx={{ display: 'flex',flexDirection:'row', p: 1,  borderRadius: 1,
@@ -368,11 +374,24 @@ const handleClickOpen = (event) => {
                             onChange={(e)=> checkBirdLibrary(e)}
                             onKeyDown={(e)=> checkBirdLibrary(e)}>
                     </Input>
-                    <CrudButton onClick={()=>navigate('/birdGallery')} color={"#2e7d72"}>Gallery</CrudButton>
+                    
+                    <Box sx={{ height: 40 }}>
+                      <Fade
+                        in={progress}
+                        style={{
+                          transitionDelay: progress ? '800ms' : '0ms',
+                        }}
+                        unmountOnExit
+                      >
+                        <CircularProgress />
+                      </Fade>
+                    </Box>
+
+                    <GridActionsCellItem  onClick={()=>navigate('/birdGallery')} icon={<CollectionsIcon sx={{color:"#2e7d32", fontSize:40}}/>}  label="Gallery"/>
             </Box>
 
             <Table>
-                <DataGrid style={{color:'black', backgroundColor:'white', width:'auto'}}
+                <DataGrid style={{color:'black', backgroundColor:'white', width:'auto',borderRadius: '34px'}}
                 rows={birds}
                 columns={columns}
                 getRowId={(row) => row._id}
@@ -412,7 +431,6 @@ const handleClickOpen = (event) => {
                                     value={value}
                                     style={{height:'40px'}}
                                     onChange={handleChange}
-                                    // className={DateStyle}
                                     renderInput={
                                       (params) => <TextField style={{background: 'white'}}  {...params}/>
                                     }

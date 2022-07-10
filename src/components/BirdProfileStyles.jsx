@@ -5,13 +5,15 @@ import styled from 'styled-components'
 export const Container = styled.div`
     user-select: none;
     color: black;
-    border-radius: 4px;
+    border-radius: 22px;
     display: flex;
     flex-direction: row;
     height: 200px;
     width: 100%;
     background: white;
 
+    box-shadow:  6px 6px 7px #9d9c9c,
+             -6px -6px 7px #ffffff;
     &:hover{
         cursor: pointer;
         transform: scale(1.1);
@@ -30,6 +32,9 @@ padding: 10px;
 background-image: url(${props => props.img });
     background-repeat:no-repeat;
     background-size: 100% 100%;
+
+    border-top-left-radius: 22px;
+    border-bottom-left-radius: 22px;
   width: 100%;
   height: auto;
   position: relative;

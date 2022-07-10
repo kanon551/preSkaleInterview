@@ -1,14 +1,17 @@
-import React, { useState,useRef,useEffect } from 'react'
+import React, { useState,useEffect } from 'react'
 import Header from '../components/Header'
-import {Library} from '../components/BirdLibrary';
 import BirdProfile from '../components/BirdProfile';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import {Container,Body,BirdsInfo} from '../Pages/BirdGalleryStyles'
+import {GalleryContainer,Body,BirdsInfo} from '../Pages/BirdGalleryStyles'
 import axios from 'axios';
+import Fade from '@mui/material/Fade';
+import CircularProgress from '@mui/material/CircularProgress';
+
 
 const BirdGallery = () => {
 
+  const [progress, setProgress] = useState(true);
   const [birds, setBirds] = useState([]);
 
   useEffect(()=>{
@@ -35,12 +38,16 @@ const BirdGallery = () => {
 
 
   const getBirds = async() => {
-    const res = await axios.get(`https://birdslibrary.herokuapp.com/api/preSkale/getBirds`)  ;
-    setBirds(getRowsWithID(res.data['object'])) 
+    await axios.get(`https://birdslibrary.herokuapp.com/api/preSkale/getBirds`)
+                .then(res => {
+                  setProgress(false);
+                  setBirds(getRowsWithID(res.data['object']));
+                })  ;
+    
   }
 
   return (
-    <Container>
+    <GalleryContainer>
       <Header/>
       <Body>
             <Box
@@ -51,6 +58,21 @@ const BirdGallery = () => {
                    Gallery
                 </BirdsInfo>
             </Box>
+            
+            <Box sx={{ height: 40 }}>
+                      <Fade
+                        in={progress}
+                        style={{
+                          transitionDelay: progress ? '800ms' : '0ms',
+                        }}
+                        unmountOnExit
+                      >
+                        <CircularProgress />
+                      </Fade>
+            </Box>
+
+
+
             <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }} 
             style={{ marginTop: '20px'}}>
                     {
@@ -63,7 +85,7 @@ const BirdGallery = () => {
                     }
             </Grid>
       </Body>
-    </Container>
+    </GalleryContainer>
   )
 }
 

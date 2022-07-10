@@ -10,7 +10,7 @@ const Header = () => {
   return (
     <div>
       <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" color='success'>
+      <AppBar position="static" sx={{background:'#ffffff',color:'black', border:'none'}}>
         <Toolbar>
           <IconButton
             size="large"

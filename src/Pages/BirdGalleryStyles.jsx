@@ -1,17 +1,17 @@
 import styled from 'styled-components'
 
-export const Container = styled.div`
+export const GalleryContainer = styled.div`
     height: 100vh;
     position: fixed;
     display: flex;
     flex-direction: column;
     width: 100%;
     overflow-y: auto;
-    background-color: #edebe9;
+    background-color: #ffffff;
 ` 
 
  export const Body = styled.div`
-    padding: 50px;
+    padding: 40px;
     flex-direction: column;
     display: flex;
     height: fit-content;
@@ -24,3 +24,4 @@ export const BirdsInfo = styled.div`
     flex-wrap: wrap;
 
 `
+
