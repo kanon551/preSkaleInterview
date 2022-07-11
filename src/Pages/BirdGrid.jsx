@@ -27,6 +27,8 @@ import AddCardIcon from '@mui/icons-material/AddCard';
 import CollectionsIcon from '@mui/icons-material/Collections';
 import Fade from '@mui/material/Fade';
 import CircularProgress from '@mui/material/CircularProgress';
+import Tooltip from '@mui/material/Tooltip';
+
 
   const BirdGrid = () => {
 
@@ -365,7 +367,10 @@ const handleClickOpen = (event) => {
                         Manage all species of birds and their information
                     </BirdInfoDescription>
                 </BirdsInfo>
-                <GridActionsCellItem  onClick={handleClickOpen} icon={<AddCardIcon sx={{color:"#2e7d32", fontSize:40}}/>}  label="Add"/>
+                <Tooltip title="Add Bird" arrow>
+                    <GridActionsCellItem  onClick={handleClickOpen} icon={<AddCardIcon sx={{color:"#2e7d32", fontSize:40}}/>}  label="Add"/>
+                </Tooltip>
+                
             </Box>
             <Box
                 sx={{ display: 'flex',flexDirection:'row', p: 1,  borderRadius: 1,
@@ -389,7 +394,10 @@ const handleClickOpen = (event) => {
                       </Fade>
                     </Box>
 
-                    <GridActionsCellItem  onClick={()=>navigate('/birdGallery')} icon={<CollectionsIcon sx={{color:"#2e7d32", fontSize:40}}/>}  label="Gallery"/>
+                    <Tooltip title="Gallery" arrow>
+                      <GridActionsCellItem  onClick={()=>navigate('/birdGallery')} icon={<CollectionsIcon sx={{color:"#2e7d32", fontSize:40}}/>}  label="Gallery"/>
+                    </Tooltip>
+                    
             </Box>
 
             <Table>
